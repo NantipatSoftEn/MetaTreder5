@@ -33,15 +33,12 @@ void OnTick()
   {
 //---
    double Equity=AccountInfoDouble(ACCOUNT_EQUITY);
-   Print("Equity ",Equity);
-   double DynamicPositionSize=NormalizeDouble((2000/100000),2);
+   double DynamicPositionSize=NormalizeDouble((Equity/100000),2);
    double Ask=NormalizeDouble(SymbolInfoDouble(_Symbol,SYMBOL_ASK),_Digits);
-   //Print(Ask);
-   Print(DynamicPositionSize);
    if(PositionsTotal()<100 && OrdersTotal()<100)
      {
       trade.BuyStop(DynamicPositionSize,Ask+100*_Point,_Symbol,0,Ask+300*_Point,ORDER_TIME_GTC,0,0);
-      Comment("Dynamic Position Siz:",DynamicPositionSize);
+      Print("Equity=",Equity," Lotsize:",DynamicPositionSize);
 
      }
   }
