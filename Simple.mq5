@@ -1,4 +1,3 @@
-
 //+------------------------------------------------------------------+
 //|                                                       Simple.mq5 |
 //|                        Copyright 2019, MetaQuotes Software Corp. |
@@ -33,29 +32,23 @@ void OnDeinit(const int reason)
 void OnTick()
   {
 //---
-   double PriceOfBuy=NormalizeDouble(SymbolInfoDouble(_Symbol,SYMBOL_ASK),_Digits);
-   double PriceOfSell=NormalizeDouble(SymbolInfoDouble(_Symbol,SYMBOL_BID),_Digits);
-
-
-   double TakeProfitBuy=(PriceOfSell+(200*_Point)); //CloseOrderAtThisPoint and TakeProFit
-   double StopLossBuy=(PriceOfBuy-(200*_Point)); //CloseOrderAtThisPoint and StopLoss
-
-   double TakeProfitSell=(PriceOfSell-(200*_Point));
-   double StopLossSell=(PriceOfBuy+(200*_Point));
-
-   double LotSize=0.10;
-   datetime DateTime=ORDER_TIME_GTC;
+   double Ask=NormalizeDouble(SymbolInfoDouble(_Symbol,SYMBOL_ASK),_Digits);
+   double Bid=NormalizeDouble(SymbolInfoDouble(_Symbol,SYMBOL_BID),_Digits);
    
-  double myMomentumValue = GenerateMomentum();
-   if(myMomentumValue>100)
+   double OpenOrderAtThisPoint=(Bid-(50*_Point));
+   double CloseOrderAtThisPoint=(Ask+(10*_Point)); // TakeProfit
+   
+   double LotSize = 0.10;
+   double StopLoss= 0;
+   
+   double MomentValue=GenerateMomentum();
+  
+   if(MomentValue < 99.99 && PositionsTotal()<10 && OrdersTotal() < 10)
      {
-      Comment("STORONG MOMENT");
-      trade.SellLimit(LotSize,PriceOfSell,_Symbol,StopLossSell,TakeProfitSell,ORDER_TIME_GTC,0,"Buy");
-     }
-   if(myMomentumValue<99)
-     {
-      Comment("Week moment");
-      trade.BuyLimit(LotSize,PriceOfBuy,_Symbol,StopLossBuy,TakeProfitBuy,ORDER_TIME_GTC,0,"Buy");
+      Comment("Week");
+      trade.BuyLimit(LotSize,OpenOrderAtThisPoint,_Symbol,StopLoss,CloseOrderAtThisPoint,ORDER_TIME_GTC,0,"Buy");
+      //Print("OpenOrderAtThisPoint=",OpenOrderAtThisPoint," CloseOrderAtThisPoint=",CloseOrderAtThisPoint);
+      //trade.SellLimit(LotSize,CloseOrderAtThisPoint,_Symbol,StopLoss,OpenOrderAtThisPoint,ORDER_TIME_GTC,0,"Sell");
      }
 
   }
@@ -69,6 +62,7 @@ double  GenerateMomentum()
    ArraySetAsSeries(myPriceArray,false);
    CopyBuffer(iMomentumDefinition,0,0,3,myPriceArray);
    double myMomentumValue=NormalizeDouble(myPriceArray[0],2);
+
    return myMomentumValue;
-  } 
-//+------------------------------------------------------------------+
+  }
+//+------------------------------------------------------------------
