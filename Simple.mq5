@@ -34,18 +34,20 @@ void OnTick()
 //---
    double Ask=NormalizeDouble(SymbolInfoDouble(_Symbol,SYMBOL_ASK),_Digits);
    double Bid=NormalizeDouble(SymbolInfoDouble(_Symbol,SYMBOL_BID),_Digits);
-   
+
    double OpenOrderAtThisPoint=(Bid-(50*_Point));
-   double CloseOrderAtThisPoint=(Ask+(10*_Point)); // TakeProfit
-   
-   double LotSize = 0.10;
+   double CloseOrderAtThisPoint=(Ask+(50*_Point)); // TakeProfit
+
+
    double StopLoss= 0;
+
+   double MomentValue = GenerateMomentum();
+   double LotSize = DynamicLotSize();
    
-   double MomentValue=GenerateMomentum();
-  
-   if(MomentValue < 99.99 && PositionsTotal()<10 && OrdersTotal() < 10)
+   
+   if(MomentValue<99.99 && PositionsTotal()<10 && OrdersTotal()<10)
      {
-      Comment("Week");
+      Comment("Week:" ,MomentValue,"LotSize:",LotSize);
       trade.BuyLimit(LotSize,OpenOrderAtThisPoint,_Symbol,StopLoss,CloseOrderAtThisPoint,ORDER_TIME_GTC,0,"Buy");
       //Print("OpenOrderAtThisPoint=",OpenOrderAtThisPoint," CloseOrderAtThisPoint=",CloseOrderAtThisPoint);
       //trade.SellLimit(LotSize,CloseOrderAtThisPoint,_Symbol,StopLoss,OpenOrderAtThisPoint,ORDER_TIME_GTC,0,"Sell");
@@ -66,3 +68,11 @@ double  GenerateMomentum()
    return myMomentumValue;
   }
 //+------------------------------------------------------------------
+
+double DynamicLotSize()
+  {
+   double Equity=AccountInfoDouble(ACCOUNT_EQUITY);
+   double LotSize=NormalizeDouble((Equity/100000),2);
+   return LotSize;
+  }
+//+------------------------------------------------------------------+
