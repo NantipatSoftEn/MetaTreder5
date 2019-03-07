@@ -38,20 +38,19 @@ void OnTick()
    double OpenOrderAtThisPoint=(Bid-(50*_Point));
    double CloseOrderAtThisPoint=(Ask+(50*_Point)); // TakeProfit
 
+   double StopLoss=0;
 
-   double StopLoss= 0;
+   double MomentValue=GenerateMomentum();
+   double LotSize=DynamicLotSize();
 
-   double MomentValue = GenerateMomentum();
-   double LotSize = DynamicLotSize();
-   
-   
    if(MomentValue<99.99 && PositionsTotal()<10 && OrdersTotal()<10)
      {
-      Comment("Week:" ,MomentValue,"LotSize:",LotSize);
+      Comment("Week:",MomentValue,"LotSize:",LotSize);
       trade.BuyLimit(LotSize,OpenOrderAtThisPoint,_Symbol,StopLoss,CloseOrderAtThisPoint,ORDER_TIME_GTC,0,"Buy");
       //Print("OpenOrderAtThisPoint=",OpenOrderAtThisPoint," CloseOrderAtThisPoint=",CloseOrderAtThisPoint);
       //trade.SellLimit(LotSize,CloseOrderAtThisPoint,_Symbol,StopLoss,OpenOrderAtThisPoint,ORDER_TIME_GTC,0,"Sell");
      }
+     CheckTrailingStop(Ask);
 
   }
 //+------------------------------------------------------------------+
@@ -73,6 +72,30 @@ double DynamicLotSize()
   {
    double Equity=AccountInfoDouble(ACCOUNT_EQUITY);
    double LotSize=NormalizeDouble((Equity/100000),2);
+   
    return LotSize;
+  }
+//+------------------------------------------------------------------+
+
+void CheckTrailingStop(double Ask)
+  {
+// Set the desired Stop Loss to 100 point 
+   double StopLoss=NormalizeDouble(Ask-100*_Point,_Digits);
+   for(int i=PositionsTotal()-1;i>=0;i--)
+     {
+      string symbol=PositionGetSymbol(i);
+      Print(symbol,"=",_Symbol);
+      if(_Symbol==symbol)
+        {
+  
+         ulong PositionTicket=PositionGetInteger(POSITION_TICKET);
+         
+         double CurrentStopLoss=PositionGetDouble(POSITION_SL);
+
+         if(CurrentStopLoss<StopLoss)
+            trade.PositionModify(PositionTicket,(CurrentStopLoss+10*_Point),0);
+
+        }
+     }
   }
 //+------------------------------------------------------------------+
