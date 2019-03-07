@@ -35,15 +35,15 @@ void OnTick()
    double Ask=NormalizeDouble(SymbolInfoDouble(_Symbol,SYMBOL_ASK),_Digits);
    double Bid=NormalizeDouble(SymbolInfoDouble(_Symbol,SYMBOL_BID),_Digits);
 
-   double OpenOrderAtThisPoint=(Bid-(50*_Point));
-   double CloseOrderAtThisPoint=(Ask+(50*_Point)); // TakeProfit
+   double OpenOrderAtThisPoint=(Bid-(10*_Point));
+   double CloseOrderAtThisPoint=(Ask+(150*_Point)); // TakeProfit
 
-   double StopLoss=Bid-(75*_Point);
+   double StopLoss=Bid-(100*_Point);
 
    double MomentValue=GenerateMomentum();
    double LotSize=DynamicLotSize();
 
-   if(MomentValue<99.99 && PositionsTotal()<2 && OrdersTotal()<2)
+   if(MomentValue<99.99 && PositionsTotal()<1 && OrdersTotal()<1)
      {
       Comment("Week:",MomentValue,"LotSize:",LotSize);
       trade.BuyLimit(LotSize,OpenOrderAtThisPoint,_Symbol,StopLoss,CloseOrderAtThisPoint,ORDER_TIME_GTC,0,"Buy");
@@ -77,7 +77,7 @@ double DynamicLotSize()
   }
 //+------------------------------------------------------------------+
 
-void CheckTrailingStop(double Ask)
+void CheckTrailingStop(double Ask )
   {
 // Set the desired Stop Loss to 100 point 
    double StopLoss=NormalizeDouble(Ask-100*_Point,_Digits);
