@@ -38,12 +38,12 @@ void OnTick()
    double OpenOrderAtThisPoint=(Bid-(50*_Point));
    double CloseOrderAtThisPoint=(Ask+(50*_Point)); // TakeProfit
 
-   double StopLoss=0;
+   double StopLoss=Bid-(75*_Point);
 
    double MomentValue=GenerateMomentum();
    double LotSize=DynamicLotSize();
 
-   if(MomentValue<99.99 && PositionsTotal()<10 && OrdersTotal()<10)
+   if(MomentValue<99.99 && PositionsTotal()<2 && OrdersTotal()<2)
      {
       Comment("Week:",MomentValue,"LotSize:",LotSize);
       trade.BuyLimit(LotSize,OpenOrderAtThisPoint,_Symbol,StopLoss,CloseOrderAtThisPoint,ORDER_TIME_GTC,0,"Buy");
