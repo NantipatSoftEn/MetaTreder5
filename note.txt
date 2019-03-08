@@ -3,11 +3,17 @@ File Simple
  
 define Order = 100
 define balance  =10000
-define avgPrice = 1.274
-define hightPrice =
-define lowPrice =
+define avgPrice = 1.270
+define hightPrice = 1.300
+define lowPrice = 1.250
+define TimeFrame = 1M 
 
-PointProfit = 10;
-PointStartOrder = 20;
-PointStopLoss = 50;
-balance  =  8800
+
+momentValue < 99
+PointProfit = 200;
+PointStartOrder = 200;
+PointStopLoss = 300;
+balance = 
+
+
+//  buy limit can move on with current price

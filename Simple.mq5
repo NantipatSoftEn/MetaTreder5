@@ -34,29 +34,44 @@ void OnTick()
 //---
    double Ask=NormalizeDouble(SymbolInfoDouble(_Symbol,SYMBOL_ASK),_Digits);
    double Bid=NormalizeDouble(SymbolInfoDouble(_Symbol,SYMBOL_BID),_Digits);
-   
-   int PointProfit = 200;
-   int PointStartOrder = 200;
-   int PointStopLoss = 300;
-    
-   double OpenOrderAtThisPoint=(Bid-(PointStartOrder*_Point));
-   double CloseOrderAtThisPoint=(Ask+(PointProfit*_Point)); // TakeProfit
-   double StopLoss=Bid+(PointStopLoss*_Point);
+
+   int PointProfit=200;
+   int PointStartOrder=200;
+   int PointStopLoss=300;
+
+   double OpenOrderOfBuy=(Ask-(PointStartOrder*_Point));
+   double CloseOrdeOfBuy=(Ask+(PointProfit*_Point)); // TakeProfit
+   double StopLossOfBuy=Ask-(PointStopLoss*_Point);
+
+   double OpenOrderOfSell=(Bid+(PointStartOrder*_Point));
+   double CloseOrderOfSell=(Bid-(PointProfit*_Point));
+   double StopLossOfSell=Bid+(PointStopLoss*_Point);
 
    double MomentValue=GenerateMomentum();
    double LotSize=DynamicLotSize();
 
-   if(MomentValue<99.99 && PositionsTotal()<100 && OrdersTotal()<100)
+   if(SetttingOrder(1))
      {
-      Comment("Week:",MomentValue,"LotSize:",LotSize);
-      //trade.BuyLimit(LotSize,OpenOrderAtThisPoint,_Symbol,StopLoss,CloseOrderAtThisPoint,ORDER_TIME_GTC,0,"Buy");
-      //Print("OpenOrderAtThisPoint=",OpenOrderAtThisPoint," CloseOrderAtThisPoint=",CloseOrderAtThisPoint);
-      trade.SellLimit(LotSize,CloseOrderAtThisPoint,_Symbol,StopLoss,OpenOrderAtThisPoint,ORDER_TIME_GTC,0,"Sell");
-    
+      
+         Comment("Week:",MomentValue,"LotSize:",LotSize);
+         trade.BuyLimit(LotSize,OpenOrderOfBuy,_Symbol,StopLossOfBuy,CloseOrdeOfBuy,ORDER_TIME_GTC,0,"Buy");
+         //trade.Buy()
+        
+      
+         //Comment("Strong:",MomentValue,"LotSize:",LotSize);
+         //trade.SellLimit(LotSize,OpenOrderOfSell,_Symbol,StopLossOfSell,CloseOrderOfSell,ORDER_TIME_GTC,0,"Sell");
+       
      }
-     
-     CheckTrailingStop(Ask);
 
+   CheckTrailingStop(Ask);
+
+  }
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+bool SetttingOrder(int Orders)
+  {
+   return PositionsTotal()< Orders && OrdersTotal()< Orders;
   }
 //+------------------------------------------------------------------+
 //|                                                                  |
@@ -77,12 +92,12 @@ double DynamicLotSize()
   {
    double Equity=AccountInfoDouble(ACCOUNT_EQUITY);
    double LotSize=NormalizeDouble((Equity/100000),2);
-   
+
    return LotSize;
   }
 //+------------------------------------------------------------------+
 
-void CheckTrailingStop(double Ask )
+void CheckTrailingStop(double Ask)
   {
 // Set the desired Stop Loss to 100 point 
    double StopLoss=NormalizeDouble(Ask-100*_Point,_Digits);
@@ -92,9 +107,9 @@ void CheckTrailingStop(double Ask )
       Print(symbol,"=",_Symbol);
       if(_Symbol==symbol)
         {
-  
+
          ulong PositionTicket=PositionGetInteger(POSITION_TICKET);
-         
+
          double CurrentStopLoss=PositionGetDouble(POSITION_SL);
 
          if(CurrentStopLoss<StopLoss)
