@@ -34,22 +34,27 @@ void OnTick()
 //---
    double Ask=NormalizeDouble(SymbolInfoDouble(_Symbol,SYMBOL_ASK),_Digits);
    double Bid=NormalizeDouble(SymbolInfoDouble(_Symbol,SYMBOL_BID),_Digits);
-
-   double OpenOrderAtThisPoint=(Bid-(10*_Point));
-   double CloseOrderAtThisPoint=(Ask+(150*_Point)); // TakeProfit
-
-   double StopLoss=Bid-(100*_Point);
+   
+   int PointProfit = 200;
+   int PointStartOrder = 200;
+   int PointStopLoss = 300;
+    
+   double OpenOrderAtThisPoint=(Bid-(PointStartOrder*_Point));
+   double CloseOrderAtThisPoint=(Ask+(PointProfit*_Point)); // TakeProfit
+   double StopLoss=Bid+(PointStopLoss*_Point);
 
    double MomentValue=GenerateMomentum();
    double LotSize=DynamicLotSize();
 
-   if(MomentValue<99.99 && PositionsTotal()<1 && OrdersTotal()<1)
+   if(MomentValue<99.99 && PositionsTotal()<100 && OrdersTotal()<100)
      {
       Comment("Week:",MomentValue,"LotSize:",LotSize);
-      trade.BuyLimit(LotSize,OpenOrderAtThisPoint,_Symbol,StopLoss,CloseOrderAtThisPoint,ORDER_TIME_GTC,0,"Buy");
+      //trade.BuyLimit(LotSize,OpenOrderAtThisPoint,_Symbol,StopLoss,CloseOrderAtThisPoint,ORDER_TIME_GTC,0,"Buy");
       //Print("OpenOrderAtThisPoint=",OpenOrderAtThisPoint," CloseOrderAtThisPoint=",CloseOrderAtThisPoint);
-      //trade.SellLimit(LotSize,CloseOrderAtThisPoint,_Symbol,StopLoss,OpenOrderAtThisPoint,ORDER_TIME_GTC,0,"Sell");
+      trade.SellLimit(LotSize,CloseOrderAtThisPoint,_Symbol,StopLoss,OpenOrderAtThisPoint,ORDER_TIME_GTC,0,"Sell");
+    
      }
+     
      CheckTrailingStop(Ask);
 
   }
