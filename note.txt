@@ -1,19 +1,15 @@
+double PointProfit=0.00004;
+double PointStartOrder=0.00002; 
+double PointStopLoss=0.00010;
 
-File Simple 
+ Order = 100  
+
+
+
+ Proofit = 7276,7333,4568,7174,7174
+
+
+ double PointStopLoss=0.00010;
  
-define Order = 100
-define balance  =10000
-define avgPrice = 1.270
-define hightPrice = 1.300
-define lowPrice = 1.250
-define TimeFrame = 1M 
 
-
-momentValue < 99
-PointProfit = 200;
-PointStartOrder = 200;
-PointStopLoss = 300;
-balance = 
-
-
-//  buy limit can move on with current price
+  Proofit = 7276,7333,4568,7174,7174
