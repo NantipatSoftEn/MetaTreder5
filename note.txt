@@ -14,6 +14,6 @@ Profit = 7276,7333,4568,7174,7174,7863
 double PointStopLoss=0.0008;
 Profit = 18252,-31979,32183,-50866,21,318
 
-
-balance =1029379.79
-Equity  =1029216.79
+Time 4:30 PM
+balance =1 029 379.79
+Equity  =1 029 216.79
