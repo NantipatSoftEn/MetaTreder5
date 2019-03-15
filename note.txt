@@ -1,15 +1,19 @@
+## Setting Envirument 
+
+
 double PointProfit=0.00004;
 double PointStartOrder=0.00002; 
 double PointStopLoss=0.00010;
+LotSize  = 1
+Timefream  =  1M
+Symbol = EUR/USD
+Order = 100  
+Profit = 7276,7333,4568,7174,7174,7863
 
- Order = 100  
+--------------------------------------------
+double PointStopLoss=0.0008;
+Profit = 18252,-31979,32183,-50866,21,318
 
 
-
- Proofit = 7276,7333,4568,7174,7174
-
-
- double PointStopLoss=0.00010;
- 
-
-  Proofit = 7276,7333,4568,7174,7174
+balance =1029379.79
+Equity  =1029216.79
