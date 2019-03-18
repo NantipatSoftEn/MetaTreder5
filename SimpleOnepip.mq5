@@ -36,9 +36,9 @@ void OnTick()
    double Bid=NormalizeDouble(SymbolInfoDouble(_Symbol,SYMBOL_BID),_Digits);
 
 
-   double PointProfit=0.00008;
+   double PointProfit=0.00006;
    double PointStartOrder=0.00002; // this is 0.0001 = 1 pips
-   double PointStopLoss=0.00010;
+   double PointStopLoss=0.00002;
    
    double OpenOrderOfBuy=(Ask+(PointStartOrder));
    
@@ -53,10 +53,10 @@ void OnTick()
    
    double LotSize =  1;
    
-   if(SetttingOrder(100))
+   if(SetttingOrder(1000))
      {
-      trade.BuyStop(LotSize,OpenOrderOfBuy,_Symbol,0,CloseOrdeOfBuy,ORDER_TIME_GTC,0,"BuyStop");
-      trade.SellStop(LotSize,OpenOrderOfSell,_Symbol,0,CloseOrderOfSell,ORDER_TIME_GTC,0,"SellStop");
+      trade.BuyStop(LotSize,OpenOrderOfBuy,_Symbol,StopLossOfBuy,CloseOrdeOfBuy,ORDER_TIME_GTC,0,"BuyStop");
+      trade.SellStop(LotSize,OpenOrderOfSell,_Symbol,StopLossOfSell,CloseOrderOfSell,ORDER_TIME_GTC,0,"SellStop");
      }
 
   }
