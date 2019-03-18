@@ -40,3 +40,13 @@ Equity  =1 029 687.79
 5:32
 balance =1 029 255.79
 Equity  =1 029 255.79
+
+
+
+   printf("ACCOUNT_PROFIT =  %G",AccountInfoDouble(ACCOUNT_PROFIT));
+
+
+
+-----------------
+6:04
+balance = 1 025 397.79
