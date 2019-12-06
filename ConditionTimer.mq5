@@ -64,9 +64,7 @@ void OnTick()
 void OnTimer()
   {
 //---
-   datetime start_time=TimeCurrent(); 
    datetime trade_server_time=TimeTradeServer(); 
-   printf("Start time: %s",TimeToString(start_time,TIME_SECONDS));
    printf("Local time: %s",TimeToString(trade_server_time,TIME_SECONDS));
    CancelOrder();
    
