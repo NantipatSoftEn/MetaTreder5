@@ -14,7 +14,9 @@ CTrade trade;
 int OnInit()
   {
 //--- create timer
-   EventSetTimer(15);
+   EventSetTimer(1);
+   
+   
 //---
    return(INIT_SUCCEEDED);
   }
@@ -51,23 +53,21 @@ void OnTick()
           CancelOrder();     
      }
      
+     
    if(SettingOrder(20))
      {
          trade.BuyLimit(LotSize,OpenOrderOfBuy,_Symbol,StopLossOfBuy,CloseOrdeOfBuy,ORDER_TIME_GTC,0,"Buy");
          trade.SellLimit(LotSize,OpenOrderOfSell,_Symbol,StopLossOfSell,CloseOrderOfSell,ORDER_TIME_GTC,0,"SELL");
      }
-    
+      
   }
 //+------------------------------------------------------------------+
 //| Timer function                                                   |
 //+------------------------------------------------------------------+
 void OnTimer()
   {
-//---
-   datetime trade_server_time=TimeTradeServer(); 
-   printf("Local time: %s",TimeToString(trade_server_time,TIME_SECONDS));
-   CancelOrder();
-   
+//---   
+      CancelOrder();
   }
 //+------------------------------------------------------------------+
 
@@ -79,9 +79,18 @@ bool SettingOrder(int Orders)
   
 void CancelOrder()
   {
+      datetime time_setup; 
       for(int i=0;i<OrdersTotal();i++)
       {
          int ticket=OrderGetTicket(i);
-         trade.OrderDelete(ticket);
+         time_setup    =(datetime)OrderGetInteger(ORDER_TIME_SETUP);
+         datetime trade_server_time=TimeTradeServer(); 
+         printf("Local time: %s ,time_setup : %s  result=%d",TimeToString(trade_server_time,TIME_SECONDS),TimeToString(time_setup,TIME_SECONDS),TimeTradeServer()-time_setup);
+ 
+         if(TimeTradeServer()-time_setup>=15)
+           {
+            printf("OrderDelete");
+            trade.OrderDelete(ticket);
+           }
       }
   }
