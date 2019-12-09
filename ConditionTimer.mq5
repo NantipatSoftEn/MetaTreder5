@@ -34,7 +34,7 @@ int OnInit()
 
    for(int i=0; i<10; i++)
      {
-      trade.SellLimit(LotSize,OpenOrderOfSell+(i*_Point),_Symbol,StopLossOfSell+(i*_Point),CloseOrderOfSell-(i*_Point),ORDER_TIME_GTC,0,"Buy");
+      trade.SellLimit(LotSize,OpenOrderOfSell+(i*_Point),_Symbol,StopLossOfSell+(i*_Point),CloseOrderOfSell-(i*_Point),ORDER_TIME_GTC,0,"Sell");
      }
 
 //---
@@ -55,7 +55,6 @@ void OnDeinit(const int reason)
 void OnTick()
   {
 //---
-
    double Ask=NormalizeDouble(SymbolInfoDouble(_Symbol,SYMBOL_ASK),_Digits);
    double Bid=NormalizeDouble(SymbolInfoDouble(_Symbol,SYMBOL_BID),_Digits);
 
@@ -67,36 +66,68 @@ void OnTick()
    double CloseOrderOfSell=Bid-(Bid*(7*_Point));
    double StopLossOfSell=OpenOrderOfSell+(OpenOrderOfSell*(7*_Point));
    double LotSize=0.001;
-
    /*if(Ask>=(OpenOrderOfBuy+(OpenOrderOfBuy*(1*_Point))))
      {
-          printf("Ask =%G",(OpenOrderOfBuy+(OpenOrderOfBuy*(1*_Point))));
-          CancelOrder();
+      printf("Ask =%G",(OpenOrderOfBuy+(OpenOrderOfBuy*(1*_Point))));
+      CancelOrder();
      }*/
-
-   /*if(SettingOrder(20))
+   /*ulong    ticket;
+   double   open_price;
+   double   initial_volume;
+   datetime time_setup;
+   string   symbol;
+   string   type;
+   long     order_magic;
+   long     positionID;
+   for(int i=OrdersTotal(); i>=0; i--)
      {
-         trade.BuyLimit(LotSize,OpenOrderOfBuy,_Symbol,StopLossOfBuy,CloseOrdeOfBuy,ORDER_TIME_GTC,0,"Buy");
-         trade.SellLimit(LotSize,OpenOrderOfSell,_Symbol,StopLossOfSell,CloseOrderOfSell,ORDER_TIME_GTC,0,"SELL");
+      if((ticket=OrderGetTicket(i))>0)
+        {
+         //--- return order properties
+         open_price    =OrderGetDouble(ORDER_PRICE_OPEN);
+         time_setup    =(datetime)OrderGetInteger(ORDER_TIME_SETUP);
+         symbol        =OrderGetString(ORDER_SYMBOL);
+         order_magic   =OrderGetInteger(ORDER_MAGIC);
+         positionID    =OrderGetInteger(ORDER_POSITION_ID);
+         initial_volume=OrderGetDouble(ORDER_VOLUME_INITIAL);
+         type          =EnumToString(ENUM_ORDER_TYPE(OrderGetInteger(ORDER_TYPE)));
+         //--- prepare and show information about the order
+         printf("#ticket %d %s %G %s at %G was set up at %s",
+                ticket,                 // order ticket
+                type,                   // type
+                initial_volume,         // placed volume
+                symbol,                 // symbol
+                open_price,             // specified open price
+                TimeToString(time_setup)// time of order placing
+               );
+         if(type=="ORDER_TYPE_BUY_LIMIT")
+           {
+            printf("ORDER_TYPE_BUY_LIMIT");
+            if(Ask>(OpenOrderOfBuy+(OpenOrderOfBuy*(1*_Point))))
+              {
+                  trade.OrderDelete(ticket);
+              }
+           }
+         else if(type=="ORDER_TYPE_SELL_LIMIT")
+           {
+            printf("ORDER_TYPE_SELL_LIMIT");
+            if(Bid>(OpenOrderOfSell+(OpenOrderOfSell*(1*_Point))))
+              {
+                  trade.OrderDelete(ticket);
+              }
+           }
+   
+        }
      }*/
-
   }
+
 //+------------------------------------------------------------------+
 //| Timer function                                                   |
 //+------------------------------------------------------------------+
 void OnTimer()
   {
 //---
-   datetime time_setup;
-   for(int i=0; i<OrdersTotal(); i++)
-     {
-      int ticket=OrderGetTicket(i);
-      time_setup    =(datetime)OrderGetInteger(ORDER_TIME_SETUP);
-      datetime trade_server_time=TimeTradeServer();
-      //printf("Local time: %s ,time_setup : %s  result=%d",TimeToString(trade_server_time,TIME_SECONDS),TimeToString(time_setup,TIME_SECONDS),TimeTradeServer()-time_setup);
-      
-      trade.OrderDelete(ticket);
-     }
+
    double Ask=NormalizeDouble(SymbolInfoDouble(_Symbol,SYMBOL_ASK),_Digits);
    double Bid=NormalizeDouble(SymbolInfoDouble(_Symbol,SYMBOL_BID),_Digits);
 
@@ -108,20 +139,30 @@ void OnTimer()
    double CloseOrderOfSell=Bid-(Bid*(7*_Point));
    double StopLossOfSell=OpenOrderOfSell+(OpenOrderOfSell*(7*_Point));
    double LotSize=0.001;
-
-
-   /*for(int i=0; i<10; i++)
+   datetime time_setup;
+   for(int i=OrdersTotal(); i>=0; i--)
      {
-      trade.BuyLimit(LotSize,OpenOrderOfBuy-(i*_Point),_Symbol,StopLossOfBuy-(i*_Point),CloseOrdeOfBuy+(i*_Point),ORDER_TIME_GTC,0,"Buy");
+      int ticket=OrderGetTicket(i);
+      time_setup    =(datetime)OrderGetInteger(ORDER_TIME_SETUP);
+      datetime trade_server_time=TimeTradeServer();
+      //printf("Local time: %s ,time_setup : %s  result=%d",TimeToString(trade_server_time,TIME_SECONDS),TimeToString(time_setup,TIME_SECONDS),TimeTradeServer()-time_setup);
+
+      trade.OrderDelete(ticket);
+      if(SettingOrder(20))
+        {
+         if(i<10)
+           {
+            trade.BuyLimit(LotSize,OpenOrderOfBuy-(i*_Point),_Symbol,StopLossOfBuy-(i*_Point),CloseOrdeOfBuy+(i*_Point),ORDER_TIME_GTC,0,"Buy");
+           }
+         else
+           {
+            trade.SellLimit(LotSize,OpenOrderOfSell+(i*_Point),_Symbol,StopLossOfSell+(i*_Point),CloseOrderOfSell-(i*_Point),ORDER_TIME_GTC,0,"Sell");
+           }
+
+        }
+
      }
-
-   for(int i=0; i<10; i++)
-     {
-      trade.SellLimit(LotSize,OpenOrderOfSell+(i*_Point),_Symbol,StopLossOfSell+(i*_Point),CloseOrderOfSell-(i*_Point),ORDER_TIME_GTC,0,"Buy");
-     }*/
-
   }
-//+------------------------------------------------------------------+
 
 //+------------------------------------------------------------------+
 //|                                                                  |
@@ -132,8 +173,6 @@ bool SettingOrder(int Orders)
   }
 
 
-
-
 /*
 buy 10 and sell 10 first time only
 every 15 sec  close and new order
@@ -142,4 +181,3 @@ every 15 sec  close and new order
 
 if price change 1% of
 */
-//+------------------------------------------------------------------+
