@@ -13,7 +13,7 @@ CTrade trade;
 double LotSize=1000;
 double Increasing = 1.2;
 int  point = 700;
-int amountOrder =20; 
+int amountOrder =20;
 double Ask;
 double Bid;
 double OpenOrderOfBuy;
@@ -25,6 +25,7 @@ double CloseOrderOfSell;
 double StopLossOfSell;
 
 int Second = 15;
+int PriceChange = 1;
 //+------------------------------------------------------------------+
 //| Expert initialization function                                   |
 //+------------------------------------------------------------------+
@@ -63,21 +64,10 @@ void OnDeinit(const int reason)
 void OnTick()
   {
 //---
-   /*double Ask=NormalizeDouble(SymbolInfoDouble(SYMBOL,SYMBOL_ASK),_Digits);
-   double Bid=NormalizeDouble(SymbolInfoDouble(SYMBOL,SYMBOL_BID),_Digits);
-
-   double OpenOrderOfBuy=(Ask-(Ask*(7*_Point))); // buy limit = down price
-   double CloseOrdeOfBuy=Ask+(Ask*(7*_Point)); // TakeProfit
-   double StopLossOfBuy=OpenOrderOfBuy-(OpenOrderOfBuy*(point*_Point));
-
-   double OpenOrderOfSell=Bid+(Bid*(point*_Point));
-   double CloseOrderOfSell=Bid-(Bid*(point*_Point));
-   double StopLossOfSell=OpenOrderOfSell+(OpenOrderOfSell*(point*_Point));
-   if(Ask>=(OpenOrderOfBuy+(OpenOrderOfBuy*(1*_Point))))
-     {
-      printf("Ask =%G",(OpenOrderOfBuy+(OpenOrderOfBuy*(1*_Point))));
-      CancelOrder();
-     }
+   setValue();
+   resetVolume();
+   double LotBuy = LotSize;
+   double LotSell = LotSize;
    ulong    ticket;
    double   open_price;
    double   initial_volume;
@@ -98,7 +88,6 @@ void OnTick()
          positionID    =OrderGetInteger(ORDER_POSITION_ID);
          initial_volume=OrderGetDouble(ORDER_VOLUME_INITIAL);
          type          =EnumToString(ENUM_ORDER_TYPE(OrderGetInteger(ORDER_TYPE)));
-         //--- prepare and show information about the order
          printf("#ticket %d %s %G %s at %G was set up at %s",
                 ticket,                 // order ticket
                 type,                   // type
@@ -110,23 +99,30 @@ void OnTick()
          if(type=="ORDER_TYPE_BUY_LIMIT")
            {
             printf("ORDER_TYPE_BUY_LIMIT");
-            if(Ask>(OpenOrderOfBuy+(OpenOrderOfBuy*(1*_Point))))
+            if(Ask>(OpenOrderOfBuy+(OpenOrderOfBuy*(PriceChange*_Point))))
               {
+               printf(OpenOrderOfBuy+(OpenOrderOfBuy*(PriceChange*_Point)));
                trade.OrderDelete(ticket);
+
+               BuyLimit(LotBuy,OpenOrderOfBuy,StopLossOfBuy,CloseOrdeOfBuy,i);
+               LotBuy=mutiplyVolume(LotBuy);
               }
            }
          else
             if(type=="ORDER_TYPE_SELL_LIMIT")
               {
                printf("ORDER_TYPE_SELL_LIMIT");
-               if(Bid>(OpenOrderOfSell+(OpenOrderOfSell*(1*_Point))))
+               if(Bid<(OpenOrderOfSell+(OpenOrderOfSell*(PriceChange*_Point))))
                  {
+                  printf(OpenOrderOfSell+(OpenOrderOfSell*(PriceChange*_Point)));
                   trade.OrderDelete(ticket);
+                  SellLimit(LotSell,OpenOrderOfSell,StopLossOfSell,CloseOrderOfSell,i);
+                  LotSell=mutiplyVolume(LotSell);
                  }
               }
 
         }
-     }*/
+     }
   }
 
 //+------------------------------------------------------------------+
