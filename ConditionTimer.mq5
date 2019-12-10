@@ -8,39 +8,42 @@
 #property version   "1.00"
 #include<Trade\Trade.mqh>
 CTrade trade;
-double LotSize=1000;
-int  point = 700;
-double Increasing = 1.2;
-string SYMBOL ="TRXUSDT.coss";
 
+
+double LotSize=1000;
+double Increasing = 1.2;
+int  point = 700;
+int amountOrder =20; 
+double Ask;
+double Bid;
+double OpenOrderOfBuy;
+double CloseOrdeOfBuy;
+double StopLossOfBuy;
+
+double OpenOrderOfSell;
+double CloseOrderOfSell;
+double StopLossOfSell;
+
+int Second = 15;
 //+------------------------------------------------------------------+
 //| Expert initialization function                                   |
 //+------------------------------------------------------------------+
 int OnInit()
   {
 //--- create timer
-   EventSetTimer(15);
-   double Ask=NormalizeDouble(SymbolInfoDouble(SYMBOL,SYMBOL_ASK),_Digits);
-   double Bid=NormalizeDouble(SymbolInfoDouble(SYMBOL,SYMBOL_BID),_Digits);
-
-   double OpenOrderOfBuy=(Ask-(Ask*(point*_Point))); // buy limit = down price
-   double CloseOrdeOfBuy=Ask+(Ask*(point*_Point)); // TakeProfit
-   double StopLossOfBuy=OpenOrderOfBuy-(OpenOrderOfBuy*(point*_Point));
-
-   double OpenOrderOfSell=Bid+(Bid*(point*_Point));
-   double CloseOrderOfSell=Bid-(Bid*(point*_Point));
-   double StopLossOfSell=OpenOrderOfSell+(OpenOrderOfSell*(point*_Point));
+   EventSetTimer(Second);
+   setValue();
    resetVolume();
-   for(int i=0; i<10; i++)
+   for(int i=0; i<(int)(amountOrder/2); i++)
      {
-      trade.BuyLimit(LotSize,OpenOrderOfBuy-(i*_Point),_Symbol,StopLossOfBuy-(i*_Point),CloseOrdeOfBuy+(i*_Point),ORDER_TIME_GTC,0,"Buy");
-      LotSize=(int)LotSize*Increasing;
+      BuyLimit(LotSize,OpenOrderOfBuy,StopLossOfBuy,CloseOrdeOfBuy,i);
+      LotSize=mutiplyVolume(LotSize);
      }
    resetVolume();
-   for(int i=0; i<10; i++)
+   for(int i=0; i<(int)(amountOrder/2); i++)
      {
-      trade.SellLimit(LotSize,OpenOrderOfSell+(i*_Point),_Symbol,StopLossOfSell+(i*_Point),CloseOrderOfSell-(i*_Point),ORDER_TIME_GTC,0,"Sell");
-      LotSize=(int)LotSize*Increasing;
+      SellLimit(LotSize,OpenOrderOfSell,StopLossOfSell,CloseOrderOfSell,i);
+      LotSize=mutiplyVolume(LotSize);
      }
 
 //---
@@ -53,7 +56,6 @@ void OnDeinit(const int reason)
   {
 //--- destroy timer
    EventKillTimer();
-
   }
 //+------------------------------------------------------------------+
 //| Expert tick function                                             |
@@ -61,8 +63,8 @@ void OnDeinit(const int reason)
 void OnTick()
   {
 //---
-   double Ask=NormalizeDouble(SymbolInfoDouble(_Symbol,SYMBOL_ASK),_Digits);
-   double Bid=NormalizeDouble(SymbolInfoDouble(_Symbol,SYMBOL_BID),_Digits);
+   /*double Ask=NormalizeDouble(SymbolInfoDouble(SYMBOL,SYMBOL_ASK),_Digits);
+   double Bid=NormalizeDouble(SymbolInfoDouble(SYMBOL,SYMBOL_BID),_Digits);
 
    double OpenOrderOfBuy=(Ask-(Ask*(7*_Point))); // buy limit = down price
    double CloseOrdeOfBuy=Ask+(Ask*(7*_Point)); // TakeProfit
@@ -71,12 +73,12 @@ void OnTick()
    double OpenOrderOfSell=Bid+(Bid*(point*_Point));
    double CloseOrderOfSell=Bid-(Bid*(point*_Point));
    double StopLossOfSell=OpenOrderOfSell+(OpenOrderOfSell*(point*_Point));
-   /*if(Ask>=(OpenOrderOfBuy+(OpenOrderOfBuy*(1*_Point))))
+   if(Ask>=(OpenOrderOfBuy+(OpenOrderOfBuy*(1*_Point))))
      {
       printf("Ask =%G",(OpenOrderOfBuy+(OpenOrderOfBuy*(1*_Point))));
       CancelOrder();
-     }*/
-   /*ulong    ticket;
+     }
+   ulong    ticket;
    double   open_price;
    double   initial_volume;
    datetime time_setup;
@@ -110,17 +112,18 @@ void OnTick()
             printf("ORDER_TYPE_BUY_LIMIT");
             if(Ask>(OpenOrderOfBuy+(OpenOrderOfBuy*(1*_Point))))
               {
-                  trade.OrderDelete(ticket);
+               trade.OrderDelete(ticket);
               }
            }
-         else if(type=="ORDER_TYPE_SELL_LIMIT")
-           {
-            printf("ORDER_TYPE_SELL_LIMIT");
-            if(Bid>(OpenOrderOfSell+(OpenOrderOfSell*(1*_Point))))
+         else
+            if(type=="ORDER_TYPE_SELL_LIMIT")
               {
+               printf("ORDER_TYPE_SELL_LIMIT");
+               if(Bid>(OpenOrderOfSell+(OpenOrderOfSell*(1*_Point))))
+                 {
                   trade.OrderDelete(ticket);
+                 }
               }
-           }
 
         }
      }*/
@@ -133,16 +136,7 @@ void OnTimer()
   {
 //---
 
-   double Ask=NormalizeDouble(SymbolInfoDouble(_Symbol,SYMBOL_ASK),_Digits);
-   double Bid=NormalizeDouble(SymbolInfoDouble(_Symbol,SYMBOL_BID),_Digits);
-
-   double OpenOrderOfBuy=(Ask-(Ask*(point*_Point))); // buy limit = down price
-   double CloseOrdeOfBuy=Ask+(Ask*(point*_Point)); // TakeProfit
-   double StopLossOfBuy=OpenOrderOfBuy-(OpenOrderOfBuy*(point*_Point));
-
-   double OpenOrderOfSell=Bid+(Bid*(point*_Point));
-   double CloseOrderOfSell=Bid-(Bid*(point*_Point));
-   double StopLossOfSell=OpenOrderOfSell+(OpenOrderOfSell*(point*_Point));
+   setValue();
    resetVolume();
    double LotBuy = LotSize;
    double LotSell = LotSize;
@@ -150,24 +144,41 @@ void OnTimer()
      {
       int ticket=OrderGetTicket(i);
       trade.OrderDelete(ticket);
-      if(SettingOrder(20))
+      if(SettingOrder(amountOrder))
         {
-         if(i<10)
+         if(i<(int)(amountOrder/2))
            {
 
-            trade.BuyLimit(LotBuy,OpenOrderOfBuy-(i*_Point),_Symbol,StopLossOfBuy-(i*_Point),CloseOrdeOfBuy+(i*_Point),ORDER_TIME_GTC,0,"Buy");
-            LotBuy=(int)LotBuy*Increasing;
+            BuyLimit(LotBuy,OpenOrderOfBuy,StopLossOfBuy,CloseOrdeOfBuy,i);
+            LotBuy=mutiplyVolume(LotBuy);
            }
          else
            {
-
-            trade.SellLimit(LotSell,OpenOrderOfSell+(i*_Point),_Symbol,StopLossOfSell+(i*_Point),CloseOrderOfSell-(i*_Point),ORDER_TIME_GTC,0,"Sell");
-            LotSell=(int)LotSell*Increasing;
+            SellLimit(LotSell,OpenOrderOfSell,StopLossOfSell,CloseOrderOfSell,i);
+            LotSell=mutiplyVolume(LotSell);
            }
 
         }
 
      }
+  }
+
+
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+void setValue()
+  {
+   Ask=NormalizeDouble(SymbolInfoDouble(_Symbol,SYMBOL_ASK),_Digits);
+   Bid=NormalizeDouble(SymbolInfoDouble(_Symbol,SYMBOL_BID),_Digits);
+
+   OpenOrderOfBuy=(Ask-(Ask*(point*_Point))); // buy limit = down price
+   CloseOrdeOfBuy=Ask+(Ask*(point*_Point)); // TakeProfit
+   StopLossOfBuy=OpenOrderOfBuy-(OpenOrderOfBuy*(point*_Point));
+
+   OpenOrderOfSell=Bid+(Bid*(point*_Point));
+   CloseOrderOfSell=Bid-(Bid*(point*_Point));
+   StopLossOfSell=OpenOrderOfSell+(OpenOrderOfSell*(point*_Point));
   }
 
 //+------------------------------------------------------------------+
@@ -185,11 +196,34 @@ void resetVolume()
   {
    LotSize=1000;
   }
+
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+void BuyLimit(double LotSize_p,double OpenOrderOfBuy_p,double StopLossOfBuy_p,double CloseOrdeOfBuy_p,int index)
+  {
+   trade.BuyLimit(LotSize_p,OpenOrderOfBuy_p-(index*_Point),_Symbol,StopLossOfBuy_p-(index*_Point),CloseOrdeOfBuy_p+(index*_Point),ORDER_TIME_GTC,0,"Buy");
+  }
+
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+void SellLimit(double LotSize_p,double OpenOrderOfSell_p,double StopLossOfSell_p,double CloseOrderOfSell_p,int index)
+  {
+   trade.SellLimit(LotSize_p,OpenOrderOfSell+(index*_Point),_Symbol,StopLossOfSell+(index*_Point),CloseOrderOfSell-(index*_Point),ORDER_TIME_GTC,0,"Sell");
+  }
+
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+int mutiplyVolume(double LotOfType)
+  {
+   return (int)LotOfType*Increasing;
+  }
+
 /*
 buy 10 and sell 10 first time only
 every 15 sec  close and new order
-
-
 
 if price change 1% of
 */
